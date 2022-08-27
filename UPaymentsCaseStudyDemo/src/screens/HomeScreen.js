@@ -1,9 +1,18 @@
 import React, {Component} from 'react';
-import {FlatList, Text, TouchableOpacity, View, Image, ActivityIndicator} from 'react-native';
+import {
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import {FloatingAction} from 'react-native-floating-action';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {access_token} from '../Constants';
+import {colors} from '../ColorConstants';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -78,22 +87,13 @@ class HomeScreen extends Component {
   renderCategoryItem = name => {
     return (
       <View
-        style={{
-          borderWidth: 2,
-          justifyContent: 'center',
-          marginHorizontal: 5,
-          borderRadius: 10,
-          backgroundColor:
-            this.state.selectedCategory === name ? 'white' : 'black',
-        }}>
+        style={styles.categoryCardStyle(this.state.selectedCategory === name)}>
         <TouchableOpacity
           onPress={() => this.setState({selectedCategory: name})}>
           <Text
-            style={{
-              fontSize: 14,
-              color: this.state.selectedCategory === name ? 'black' : 'white',
-              marginHorizontal: 10,
-            }}>
+            style={styles.categoryTextStyle(
+              this.state.selectedCategory === name,
+            )}>
             {name}
           </Text>
         </TouchableOpacity>
@@ -105,34 +105,20 @@ class HomeScreen extends Component {
     return (
       <TouchableOpacity
         onPress={() => this.props.navigation.navigate('Detail', {item})}
-        style={{
-          borderWidth: 1,
-          borderRadius: 5,
-          marginBottom: '2%',
-          marginRight: '2%',
-          width: '48%',
-          justifyContent: 'center',
-        }}>
+        style={styles.productCardStyle}>
         <Image
-          resizeMode="contain"
+          resizeMode={'contain'}
           onError={() => this.goForAxiosProducts()}
-          style={{width: 100, height: 100, alignSelf: 'center', margin: '5%'}}
+          style={styles.productImageStyle}
           source={{uri: item.avatar}}
         />
-        <View style={{backgroundColor: 'black', padding: 5, borderRadius: 5}}>
-          <Text style={{flex: 1, color: 'white'}}>{item.name}</Text>
-          <Text style={{flex: 1, color: 'white'}}>{`$${item.price}`}</Text>
+        <View style={styles.productCardFooterStyle}>
+          <Text style={styles.textStyle}>{item.name}</Text>
+          <Text style={styles.textStyle}>{`$${item.price}`}</Text>
           <Image
             resizeMode="contain"
             onError={() => this.goForAxiosProducts()}
-            style={{
-              position: 'absolute',
-              width: 30,
-              height: 25,
-              bottom: 10,
-              right: 10,
-              // margin: '5%',
-            }}
+            style={styles.pencilIconStyle}
             source={require('../assets/pencil.png')}
           />
         </View>
@@ -142,33 +128,28 @@ class HomeScreen extends Component {
 
   render() {
     if (this.state.loading) {
-      return <ActivityIndicator color={'black'} size={32} style={{flex: 1}} />;
+      return (
+        <ActivityIndicator
+          color={colors.black}
+          size={32}
+          style={styles.activityIndicatorStyle}
+        />
+      );
     }
     return (
-      <View style={{flex: 1, backgroundColor: 'white'}}>
+      <View style={styles.containerStyle}>
         <FlatList
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          style={{
-            flexGrow: 0,
-            height: '10%',
-          }}
-          contentContainerStyle={{
-            padding: 10,
-            paddingVertical: 15,
-          }}
+          style={styles.categoriesFlatlistStyle}
+          contentContainerStyle={styles.categoriesContentContainerStyle}
           data={this.state.categories}
           renderItem={({item}) => this.renderCategoryItem(item.name)}
         />
         <FlatList
           showsHorizontalScrollIndicator={false}
-          style={{
-            flexGrow: 0,
-          }}
-          contentContainerStyle={{
-            paddingVertical: 5,
-            paddingLeft: '2%',
-          }}
+          style={styles.productsFlatlistStyle}
+          contentContainerStyle={styles.productsContentContainerStyle}
           numColumns={2}
           data={
             this.state.selectedCategory === 'All'
@@ -183,7 +164,7 @@ class HomeScreen extends Component {
           ref={ref => {
             this.floatingAction = ref;
           }}
-          color={'white'}
+          color={colors.white}
           floatingIcon={<Icon name={'add'} size={32} />}
           onOpen={() => {
             this.floatingAction?.animateButton();
@@ -194,5 +175,73 @@ class HomeScreen extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  activityIndicatorStyle: {
+    flex: 1,
+  },
+  containerStyle: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  categoriesFlatlistStyle: {
+    flexGrow: 0,
+    height: '10%',
+  },
+  categoriesContentContainerStyle: {
+    padding: 10,
+    paddingVertical: 15,
+  },
+  productsFlatlistStyle: {
+    flexGrow: 0,
+  },
+  productsContentContainerStyle: {
+    paddingVertical: 5,
+    paddingLeft: '2%',
+  },
+  pencilIconStyle: {
+    position: 'absolute',
+    width: 30,
+    height: 25,
+    bottom: 10,
+    right: 10,
+    // margin: '5%',
+  },
+  textStyle: {
+    flex: 1,
+    color: colors.white,
+  },
+  productCardFooterStyle: {
+    backgroundColor: colors.black,
+    padding: 5,
+    borderRadius: 5,
+  },
+  productImageStyle: {
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
+    margin: '5%',
+  },
+  productCardStyle: {
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: '2%',
+    marginRight: '2%',
+    width: '48%',
+    justifyContent: 'center',
+  },
+  categoryTextStyle: condition => ({
+    fontSize: 14,
+    marginHorizontal: 10,
+    color: condition ? colors.black : colors.white,
+  }),
+  categoryCardStyle: condition => ({
+    borderWidth: 2,
+    justifyContent: 'center',
+    marginHorizontal: 5,
+    borderRadius: 10,
+    backgroundColor: condition ? colors.white : colors.black,
+  }),
+});
 
 export default HomeScreen;
