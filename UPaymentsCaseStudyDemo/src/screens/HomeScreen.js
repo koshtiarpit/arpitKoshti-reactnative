@@ -28,6 +28,17 @@ class HomeScreen extends Component {
   componentDidMount() {
     this.goForAxiosCategories();
     this.goForAxiosProducts();
+    this.willFocusSubscription = this.props.navigation.addListener(
+      'focus',
+      () => {
+        this.goForAxiosCategories();
+        this.goForAxiosProducts();
+      },
+    );
+  }
+
+  componentWillUnmount() {
+    this.willFocusSubscription();
   }
 
   goForAxiosCategories = () => {
