@@ -92,7 +92,7 @@ class CreateScreen extends Component {
       Avtar: avtar,
       DeveloperEmail: developerEmail,
     };
-    alert(JSON.stringify(payload, null, 2));
+    // alert(JSON.stringify(payload, null, 2));
     this.setState({loading: true});
     axios
       .post(
